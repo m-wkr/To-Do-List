@@ -1,0 +1,96 @@
+.App {
+  text-align: center;
+}
+
+header {
+  border-bottom: 1em dashed #788ad0;
+}
+
+header > h1 {
+  color: #2B386E;
+  font-weight: bolder;
+  font-size: 3em;
+}
+
+.Pinboard {
+  margin: auto;
+  width: 60vw;
+  height: 80vh;
+}
+
+ul {
+  padding-left: 0;
+}
+
+li {
+  background-color: #D7DAE5;
+  border-left: 1em solid #A5C5DA;
+  border-radius: 1em;
+  list-style: none;
+  min-height: 12em;
+  margin-bottom: 3em;
+}
+
+li:hover {
+  border-color: #788ad0;
+  transform: scale(1.02);
+  transition: transform 0.1s linear 0ms;
+}
+
+.buttons {
+  padding-top: 2.4em;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+button {
+  padding: 0.4em;
+  border-radius: 0.4em;
+  color: #D7DAE5;
+  font-weight: bolder;
+  font-size: 1.2em;
+}
+
+.greenButton {
+  background-color: #81A684;
+  border: 0.2em solid #6f9672
+}
+
+.redButton {
+  background-color: #BC7575;
+  border: 0.2em solid #ad6262;
+}
+
+.noteButton {
+  background-color: #2B386E;
+  border: 0.4em solid #2B386E;
+}
+
+.noteButton:active {
+  background-color: #D7DAE5;
+  border: 0.4em solid #D7DAE5;
+  color: #2B386E;
+}
+
+
+#NoteAdder {
+  position: fixed;
+  top: 30vh;
+  left: 3vw;
+  
+  padding: 0.6em;
+  background-color:#788ad080;
+  border-radius: 0.2em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+}
+
+textarea {
+  height: 20vh;
+  color:#2B386E;
+  resize: horizontal;
+}

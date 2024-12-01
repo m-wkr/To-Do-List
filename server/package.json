@@ -1,0 +1,19 @@
+{
+  "name": "to_do_list_server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc index.ts && node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}
