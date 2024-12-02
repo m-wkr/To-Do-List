@@ -2,58 +2,89 @@ import React from 'react';
 import './App.css';
 
 
-let tasks:string[] = []
-
-
 class Pinboard extends React.Component<{},{items:string[]}> {
   constructor(props:{}) {
     super(props);
     this.state = {
-      items: tasks
+      items: [] 
     }
-    this.updateNotes = this.updateNotes.bind(this);
+    this.addNote = this.addNote.bind(this);
+    this.deleteNote = this.deleteNote.bind(this);
+
   }
 
   componentDidMount(): void {
     fetch("/api")
     .then((res) => res.json())
     .then((data) =>  {
-      this.setState({items: data.message.split(",")});
-      tasks = this.state.items;
+      if (data.message.indexOf(",") > -1) {
+        this.setState({items: data.message.split(",")});
+      } else if ( data.message !== "" ) {
+        this.setState({items: [data.message]})
+      }
     });
   }
 
-  updateNotes() {
+  addNote(newNote:string) {
+    const tempItems = this.state.items;
+    tempItems.push(newNote)
     this.setState({
-      items: tasks
-    });
+      items: tempItems
+    }, () => {
+      fetch("/POST",
+        {
+          method:"POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'},
+          body: JSON.stringify({message:this.state.items.join(",")}) 
+        }
+      )
+    })
+  }
+
+  deleteNote(target:string) {
+    const tempItems = this.state.items;
+    const index = tempItems.indexOf(target);
+    tempItems.splice(index,1);
+    this.setState({
+      items: tempItems
+    }, () => {
+      fetch("/POST",
+        {
+          method:"POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'},
+          body: JSON.stringify({message:this.state.items.join(",")}) 
+        }
+      )
+    })
   }
 
   render() {
-    const items= this.state.items.map(i => <Note title={i}/>)
+    const items = this.state.items.map(i => <Note title={i} noteDelete={this.deleteNote}/>)
 
     return (
       <>
         <div className="Pinboard">
           {!items ? <></> : <ul>{items}</ul>}
         </div>
-        <NoteAdder updatePin={this.updateNotes}/>
+        <NoteAdder updatePin={this.addNote}/>  
       </>
     )
   }
 }
 
 
-class Note extends React.Component<{title:string},{style:{textDecoration: string, color: string},render:boolean}> {
+class Note extends React.Component<{title:string,noteDelete:Function},{style:{textDecoration: string, color: string}}> {
   constructor(props:any) {
     super(props);
     this.state = {
       style: {
         textDecoration: "none",
         color: "#2B386E"
-      },
-      render: true
-
+      }
     }
     this.ticked = this.ticked.bind(this);
     this.hidden = this.hidden.bind(this);
@@ -72,37 +103,20 @@ class Note extends React.Component<{title:string},{style:{textDecoration: string
   }
 
   hidden() {
-    if (this.state.render) {
-      this.setState({
-        render: false
-      });
-      tasks = tasks.filter(i => i !== this.props.title);
-      fetch("/post",
-        {
-          method:"POST",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'},
-          body: JSON.stringify({message:tasks.join(",")})
-        }
-      )
-    }
+    this.props.noteDelete(this.props.title);
   }
 
   render() {
-    if (this.state.render) {
-      return (
-        <li>
-          <h1 style={this.state.style}>{this.props.title}</h1>
-          <div className="buttons">
-            <button type="button" className="greenButton" onClick={this.ticked}>TICK DONE</button>
-            <button type="button" className="redButton" onClick={this.hidden}>DELETE</button>
-          </div>
-        </li>
-      )
-    } else {
-      return <></>
-    }
+    return (
+      <li>
+        <h1 style={this.state.style}>{this.props.title}</h1>
+        <div className="buttons">
+          <button type="button" className="greenButton" onClick={this.ticked}>TICK DONE</button>
+          <button type="button" className="redButton" onClick={this.hidden}>DELETE</button>
+        </div>
+      </li>
+    )
+
   }
 }
 
@@ -120,7 +134,8 @@ class NoteAdder extends React.Component<{updatePin:Function},{input:string,submi
   inputNote(event:any) {
     this.setState({
       input: event.target.value
-    })
+    });
+    
   }
 
   inputUpdate(event:any) {
@@ -128,9 +143,9 @@ class NoteAdder extends React.Component<{updatePin:Function},{input:string,submi
     if (this.state.input) {
       this.setState({
         submitInput: this.state.input
+      }, () => {
+        this.props.updatePin(this.state.submitInput)
       })
-      tasks.push(this.state.input)
-      this.props.updatePin();
     }
   }
 
